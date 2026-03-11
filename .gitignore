@@ -1,0 +1,40 @@
+# OS
+.DS_Store
+._*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Editors
+*~
+\#*\#
+.\#*
+*.swp
+*.swo
+.netrwhist
+
+# Env
+.env
+.env.*
+!.env.example
+.envrc
+
+# Go build and tests
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+coverage.out
+cover.out
+*.coverprofile
+bin/
+build/
+dist/
+tmp/
+
+# Logs
+*.log

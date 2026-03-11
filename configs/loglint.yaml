@@ -1,0 +1,23 @@
+version: 1.0
+
+auto_fix: true
+
+rules:
+  - name: lowercase_start
+    enable: true
+
+  - name: english_only
+    enable: true
+
+  - name: no_special_chars
+    enable: true
+
+  - name: no_sensitive_data
+    enable: true
+
+loggers:
+  include:
+    - log
+    - slog
+    - logrus.Logger
+    - zap.SugaredLogger
