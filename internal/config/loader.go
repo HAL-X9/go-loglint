@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// LoadConfig reads a YAML configuration file from the given path,
+// unmarshals it into a Config struct, and validates it.
 func LoadConfig(path string) (*Config, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -26,6 +28,9 @@ func LoadConfig(path string) (*Config, error) {
 	return &config, nil
 }
 
+// LoadFromEnv loads the configuration from the path specified by
+// the LOGLINT_CONFIG_PATH environment variable.
+// Returns an error if the variable is not set or the file is invalid.
 func LoadFromEnv() (*Config, error) {
 	path := os.Getenv("LOGLINT_CONFIG_PATH")
 	if path == "" {

@@ -1,6 +1,6 @@
 package config
 
-type Rules struct {
+type Rule struct {
 	Name   string `yaml:"name"`
 	Enable bool   `yaml:"enable"`
 }
@@ -11,6 +11,6 @@ type Loggers struct {
 
 type Config struct {
 	AutoFix bool    `yaml:"auto_fix"`
-	Rules   []Rules `yaml:"rules"`
+	Rules   []Rule  `yaml:"rules"`
 	Loggers Loggers `yaml:"loggers"`
 }
