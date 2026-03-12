@@ -3,7 +3,6 @@ package module
 
 import (
 	"github.com/HAL-X9/go-loglint/internal/analyzer"
-	"github.com/HAL-X9/go-loglint/internal/config"
 	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 )
@@ -13,9 +12,8 @@ func init() {
 }
 
 func New(settings any) (register.LinterPlugin, error) {
-	if path := config.GetPathFromGolangciLintSettings(settings); path != "" {
-		analyzer.SetConfigPath(path)
-	}
+	// Note: settings.config from golangci-lint is not passed reliably to module plugins.
+	// Use LOGLINT_CONFIG_PATH env var for config: LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
 	return &loglintPlugin{}, nil
 }
 
