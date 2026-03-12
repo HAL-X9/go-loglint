@@ -1,6 +1,6 @@
 # go-loglint
 
-A Go linter for log statements that enforces best practices and consistency across your logging code.
+A Go linter for log statements that enforces best practices and consistency across your logging code. Works as a golangci-lint plugin and as a standalone CLI.
 
 ## Features
 
@@ -37,12 +37,18 @@ make build
 
 ### Usage
 
-1. **Create a config file** (or use the example in `configs/loglint.yaml`):
+```bash
+# Without config — all rules enabled
+loglint ./...
+
+# With config
+loglint -config=loglint.yaml ./...
+```
+
+Config file example (`loglint.yaml`):
 
 ```yaml
-version: 1.0
 auto_fix: true
-
 rules:
   - name: lowercase_start
     enable: true
@@ -52,24 +58,8 @@ rules:
     enable: true
   - name: no_sensitive_data
     enable: true
-
 loggers:
-  include:
-    - log
-    - slog
-    - logrus.Logger
-    - zap.SugaredLogger
-```
-
-2. **Run loglint**:
-
-```bash
-# Using Make (recommended)
-LOGLINT_CONFIG=./configs/loglint.yaml make run-loglint
-
-# Or with environment variable
-export LOGLINT_CONFIG_PATH=./configs/loglint.yaml
-go run ./cmd
+  include: [log, slog, logrus.Logger, zap.SugaredLogger]
 ```
 
 ## Configuration
