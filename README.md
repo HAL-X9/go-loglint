@@ -115,7 +115,7 @@ plugins:
   # Remote (from GitHub)
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.1
+    version: v1.0.2
 
   # Or local
   # - module: github.com/HAL-X9/go-loglint
@@ -143,6 +143,8 @@ linters:
       loglint:
         type: module
         description: Log message linter
+        settings:
+          config: ./loglint.yaml
 ```
 
 ### 4. Run
@@ -153,15 +155,7 @@ linters:
 
 **Tip:** Add `custom-gcl` to `.gitignore` — each developer builds locally. In CI: add `golangci-lint custom` step before running.
 
-### Custom rules (loglint.yaml)
-
-Put `loglint.yaml` in your project root and run:
-
-```bash
-LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
-```
-
-Or in CI: `LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run`
+Config path is set via `settings.config` in `.golangci.yml`. Without it, all rules are enabled by default.
 
 ## Configuration
 

@@ -18,6 +18,11 @@ func init() {
 	Analyzer.Flags.StringVar(&configPath, "config", "", "path to YAML config file (optional, all rules enabled by default)")
 }
 
+// SetConfigPath sets the config file path (used by golangci-lint plugin).
+func SetConfigPath(p string) {
+	configPath = p
+}
+
 // Analyzer checks log messages against defined rules.
 var Analyzer = &analysis.Analyzer{
 	Name: "loglint",

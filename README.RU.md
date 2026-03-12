@@ -16,7 +16,7 @@ version: v2.11.3   # Должно совпадать с: golangci-lint version
 plugins:
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.1
+    version: v1.0.2
 ```
 
 **Шаг 2.** Собери кастомный golangci-lint:
@@ -39,6 +39,8 @@ linters:
       loglint:
         type: module
         description: Log message linter
+        settings:
+          config: ./loglint.yaml
 ```
 
 **Шаг 4.** Запуск:
@@ -47,11 +49,7 @@ linters:
 ./custom-gcl run
 ```
 
-**С конфигом правил:**
-
-```bash
-LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
-```
+Конфиг `loglint.yaml` задаётся через `settings.config` в `.golangci.yml`. Без него все правила включены по умолчанию.
 
 ---
 

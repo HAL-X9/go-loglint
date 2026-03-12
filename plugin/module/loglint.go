@@ -11,7 +11,14 @@ func init() {
 	register.Plugin("loglint", New)
 }
 
+type loglintSettings struct {
+	Config string `mapstructure:"config"`
+}
+
 func New(settings any) (register.LinterPlugin, error) {
+	if s, err := register.DecodeSettings[loglintSettings](settings); err == nil && s.Config != "" {
+		analyzer.SetConfigPath(s.Config)
+	}
 	return &loglintPlugin{}, nil
 }
 
