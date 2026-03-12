@@ -38,12 +38,14 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	if path == "" {
 		path = os.Getenv("LOGLINT_CONFIG_PATH")
 	}
-	if path != "" {
+	explicitConfig := path != ""
+	if explicitConfig {
 		resolved := resolveConfigPath(path, pass)
 		cfg, err := config.LoadConfig(resolved)
 		if err != nil {
-			// Config load failed — use default rules so linter still runs
-			enabledRules = defaultEnabledRules()
+			// If user explicitly provides a config, do not silently fall back
+			// to defaults on load/validation errors.
+			enabledRules = map[string]bool{}
 		} else {
 			enabledRules = make(map[string]bool)
 			for _, r := range cfg.Rules {
