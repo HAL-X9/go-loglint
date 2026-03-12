@@ -115,7 +115,7 @@ plugins:
   # Remote (from GitHub)
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.11
+    version: v1.0.12
 
   # Or local
   # - module: github.com/HAL-X9/go-loglint
@@ -149,15 +149,18 @@ linters:
 
 ```bash
 # Without config — all rules enabled by default
+./custom-gcl cache clean
 ./custom-gcl run
 
 # With config — use LOGLINT_CONFIG_PATH
+./custom-gcl cache clean
 LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
 ```
 
 **Tip:** Add `custom-gcl` to `.gitignore` — each developer builds locally. In CI: add `golangci-lint custom` step before running.
 
 **Note:** golangci-lint does not pass `settings.config` to module plugins. Use `LOGLINT_CONFIG_PATH` for config.
+If you change `loglint.yaml` and get inconsistent results, run `./custom-gcl cache clean` before the next run.
 
 ## Configuration
 

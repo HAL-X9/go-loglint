@@ -16,7 +16,7 @@ version: v2.11.3   # Должно совпадать с: golangci-lint version
 plugins:
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.11
+    version: v1.0.12
 ```
 
 **Шаг 2.** Собери кастомный golangci-lint:
@@ -45,13 +45,16 @@ linters:
 
 ```bash
 # Без конфига — все правила включены по умолчанию
+./custom-gcl cache clean
 ./custom-gcl run
 
 # С конфигом — через переменную окружения
+./custom-gcl cache clean
 LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
 ```
 
 **Важно:** golangci-lint не передаёт `settings.config` в плагины. Используй `LOGLINT_CONFIG_PATH` для конфига.
+Если после изменения `loglint.yaml` результат выглядит неконсистентным, перед запуском выполни `./custom-gcl cache clean`.
 
 ---
 
