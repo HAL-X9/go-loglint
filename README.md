@@ -101,19 +101,19 @@ slog.Debug("api request completed")
 slog.Info("authentication completed")
 ```
 
-## golangci-lint Plugin (Module Plugin — recommended)
+## golangci-lint Plugin
 
-Module plugin works with any golangci-lint installation. No CGO required.
+Uses **Module Plugin** — the recommended golangci-lint integration. Works with any installation (brew, go install), no CGO required.
 
 ### 1. Create `.custom-gcl.yml` in your project
 
 ```yaml
-# Get your version: golangci-lint version
-version: v2.10.0
+# Get version: golangci-lint version
+version: v2.11.3
 
 plugins:
   - module: github.com/go-loglint
-    path: /path/to/loglint   # or use version: v1.0.0 when published
+    path: /path/to/loglint
     import: github.com/go-loglint/plugin/module
 ```
 
@@ -123,7 +123,7 @@ plugins:
 golangci-lint custom
 ```
 
-This creates `./custom-gcl` (or `./golangci-lint` depending on config).
+Creates `./custom-gcl` binary.
 
 ### 3. Add to `.golangci.yml`
 
@@ -132,7 +132,6 @@ version: "2"
 linters:
   enable:
     - loglint
-    # ... other linters
   settings:
     custom:
       loglint:
@@ -146,27 +145,7 @@ linters:
 ./custom-gcl run
 ```
 
----
-
-### Go Plugin (legacy, requires CGO)
-
-```bash
-CGO_ENABLED=1 make build-plugin
-cp ./bin/loglint.so ~/.golangci-lint/plugins/
-```
-
-Add to `.golangci.yml`:
-
-```yaml
-linters:
-  settings:
-    custom:
-      loglint:
-        path: /Users/sergey/.golangci-lint/plugins/loglint.so
-        description: Log message linter
-```
-
-Note: Go plugin requires golangci-lint built with CGO; pre-built binaries often don't support it.
+**Tip:** Add `custom-gcl` to `.gitignore` — each developer builds locally. In CI: add `golangci-lint custom` step before running.
 
 ## Configuration
 
@@ -205,7 +184,7 @@ Example files in `testdata/example/` demonstrate all rules:
 make help          # Show available commands
 make run-loglint   # Run loglint locally
 make build         # Build binary to ./bin/
-make build-plugin  # Build golangci-lint plugin
+make build-plugin  # Build Go plugin
 make test          # Run tests
 make clean         # Remove build artifacts
 ```
