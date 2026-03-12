@@ -46,10 +46,16 @@ func TestNoSpecialChars(t *testing.T) {
 	}{
 		{"", true},
 		{"hello", true},
-		{"a-z 0-9 !@#", true},
+		{"hello world 123", true},
 		{"hello\n", false},
 		{"\thello", false},
-		{"привет", false},
+		{"connection failed!!!", false},
+		{"something went wrong...", false},
+		{"hello!", false},
+		{"really?", false},
+		{"done.", false},
+		{"error: failed", false},
+		{"user@host", false},
 	}
 	for _, tt := range tests {
 		if got := noSpecialChars(tt.msg); got != tt.want {

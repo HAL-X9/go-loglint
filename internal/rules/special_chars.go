@@ -1,8 +1,10 @@
 package rules
 
+import "unicode"
+
 func noSpecialChars(msg string) bool {
 	for _, r := range msg {
-		if !(r >= 32 && r <= 126) {
+		if !unicode.IsLetter(r) && !unicode.IsNumber(r) && r != ' ' {
 			return false
 		}
 	}

@@ -1,7 +1,10 @@
-package plugin
+package main
 
 import (
 	"github.com/go-loglint/internal/analyzer"
+	"golang.org/x/tools/go/analysis"
 )
 
-var Analyzer = analyzer.Analyzer
+func New(conf any) ([]*analysis.Analyzer, error) {
+	return []*analysis.Analyzer{analyzer.Analyzer}, nil
+}

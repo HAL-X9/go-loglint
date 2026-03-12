@@ -78,19 +78,37 @@ func checkLogCall(pass *analysis.Pass, call *ast.CallExpr, rulesList []rules.Rul
 		return
 	}
 
-	arg, ok := call.Args[0].(*ast.BasicLit)
-	if !ok {
+	messages := extractStrings(call.Args[0])
+	if len(messages) == 0 {
 		return
 	}
 
-	message := strings.Trim(arg.Value, `"`)
 	report := func(pos token.Pos, format string, args ...interface{}) {
 		pass.Reportf(pos, format, args...)
 	}
 
-	for _, rule := range rulesList {
-		rule(message, call.Pos(), report)
+	for _, message := range messages {
+		for _, rule := range rulesList {
+			rule(message, call.Pos(), report)
+		}
 	}
+}
+
+// extractStrings collects string literals from an expression (handles concatenation).
+func extractStrings(expr ast.Expr) []string {
+	switch e := expr.(type) {
+	case *ast.BasicLit:
+		if e.Kind == token.STRING {
+			return []string{strings.Trim(e.Value, `"`)}
+		}
+		return nil
+	case *ast.BinaryExpr:
+		if e.Op != token.ADD {
+			return nil
+		}
+		return append(extractStrings(e.X), extractStrings(e.Y)...)
+	}
+	return nil
 }
 
 // isLoggerCall reports whether sel is a logging call (Info, Warn, Error, etc.).

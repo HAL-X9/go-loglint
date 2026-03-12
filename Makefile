@@ -7,6 +7,7 @@ help: ## Show available commands
 	@echo "Available targets:"
 	@echo "  make run-loglint - Run loglint locally"
 	@echo "  make build       - Build loglint binary"
+	@echo "  make plugin      - Build golangci-lint plugin (CGO_ENABLED=1)"
 	@echo "  make test        - Run all tests"
 	@echo "  make clean       - Remove build artifacts"
 
@@ -15,6 +16,9 @@ run-loglint: ## Run loglint with local config
 
 build: ## Build loglint binary
 	go build -o ./bin/$(APP_NAME) ./cmd
+
+plugin: ## Build golangci-lint plugin
+	CGO_ENABLED=1 go build -buildmode=plugin -o ./bin/loglint.so ./plugin
 
 test: ## Run all tests
 	go test ./...
