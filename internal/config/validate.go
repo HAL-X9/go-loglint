@@ -21,7 +21,7 @@ func Validate(cfg *Config) error {
 }
 
 func ValidateRule(rules []Rule) error {
-	if rules == nil || len(rules) == 0 {
+	if len(rules) == 0 {
 		return fmt.Errorf("no rules defined in the configuration")
 	}
 
