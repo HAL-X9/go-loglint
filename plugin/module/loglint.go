@@ -3,6 +3,7 @@ package module
 
 import (
 	"github.com/HAL-X9/go-loglint/internal/analyzer"
+	"github.com/HAL-X9/go-loglint/internal/config"
 	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 )
@@ -11,25 +12,9 @@ func init() {
 	register.Plugin("loglint", New)
 }
 
-type loglintSettings struct {
-	Config string `json:"config"`
-}
-
-type loglintSettingsNested struct {
-	Settings struct {
-		Config string `json:"config"`
-	} `json:"settings"`
-}
-
 func New(settings any) (register.LinterPlugin, error) {
-	// Try flat structure first: {config: "..."}
-	if s, err := register.DecodeSettings[loglintSettings](settings); err == nil && s.Config != "" {
-		analyzer.SetConfigPath(s.Config)
-		return &loglintPlugin{}, nil
-	}
-	// Try nested: {settings: {config: "..."}}
-	if s, err := register.DecodeSettings[loglintSettingsNested](settings); err == nil && s.Settings.Config != "" {
-		analyzer.SetConfigPath(s.Settings.Config)
+	if path := config.GetPathFromGolangciLintSettings(settings); path != "" {
+		analyzer.SetConfigPath(path)
 	}
 	return &loglintPlugin{}, nil
 }

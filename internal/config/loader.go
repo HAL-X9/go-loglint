@@ -1,11 +1,45 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
 )
+
+// GetPathFromGolangciLintSettings extracts config path from golangci-lint custom linter settings.
+// Handles both flat {config: "..."} and nested {settings: {config: "..."}}.
+func GetPathFromGolangciLintSettings(settings any) string {
+	m := toMap(settings)
+	if m == nil {
+		return ""
+	}
+	if c, ok := m["config"].(string); ok && c != "" {
+		return c
+	}
+	if s, ok := m["settings"].(map[string]any); ok {
+		if c, ok := s["config"].(string); ok && c != "" {
+			return c
+		}
+	}
+	return ""
+}
+
+func toMap(v any) map[string]any {
+	if m, ok := v.(map[string]any); ok {
+		return m
+	}
+	data, err := json.Marshal(v)
+	if err != nil {
+		return nil
+	}
+	var m map[string]any
+	if json.Unmarshal(data, &m) != nil {
+		return nil
+	}
+	return m
+}
 
 // LoadConfig reads a YAML configuration file from the given path,
 // unmarshals it into a Config struct, and validates it.
