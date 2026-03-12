@@ -112,9 +112,15 @@ Uses **Module Plugin** — the recommended golangci-lint integration. Works with
 version: v2.11.3
 
 plugins:
-  - module: github.com/go-loglint
-    path: /path/to/loglint
-    import: github.com/go-loglint/plugin/module
+  # Remote (from GitHub)
+  - module: github.com/loglint/loglint
+    import: github.com/loglint/loglint/plugin/module
+    version: v1.0.0
+
+  # Or local
+  # - module: github.com/loglint/loglint
+  #   path: /path/to/loglint
+  #   import: github.com/loglint/loglint/plugin/module
 ```
 
 ### 2. Build custom golangci-lint
@@ -146,6 +152,16 @@ linters:
 ```
 
 **Tip:** Add `custom-gcl` to `.gitignore` — each developer builds locally. In CI: add `golangci-lint custom` step before running.
+
+### Custom rules (loglint.yaml)
+
+Put `loglint.yaml` in your project root and run:
+
+```bash
+LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run
+```
+
+Or in CI: `LOGLINT_CONFIG_PATH=./loglint.yaml ./custom-gcl run`
 
 ## Configuration
 

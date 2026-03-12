@@ -4,10 +4,11 @@ package analyzer
 import (
 	"go/ast"
 	"go/token"
+	"os"
 	"strings"
 
-	"github.com/go-loglint/internal/config"
-	"github.com/go-loglint/internal/rules"
+	"github.com/loglint/loglint/internal/config"
+	"github.com/loglint/loglint/internal/rules"
 	"golang.org/x/tools/go/analysis"
 )
 
@@ -27,8 +28,12 @@ var Analyzer = &analysis.Analyzer{
 // run walks the AST and checks function calls for log message violations.
 func run(pass *analysis.Pass) (interface{}, error) {
 	enabledRules := defaultEnabledRules()
-	if configPath != "" {
-		cfg, err := config.LoadConfig(configPath)
+	path := configPath
+	if path == "" {
+		path = os.Getenv("LOGLINT_CONFIG_PATH")
+	}
+	if path != "" {
+		cfg, err := config.LoadConfig(path)
 		if err != nil {
 			return nil, err
 		}

@@ -2,7 +2,7 @@
 package module
 
 import (
-	"github.com/go-loglint/internal/analyzer"
+	"github.com/loglint/loglint/internal/analyzer"
 	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 )

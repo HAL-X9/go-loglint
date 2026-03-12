@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/go-loglint/internal/analyzer"
+	"github.com/loglint/loglint/internal/analyzer"
 	"golang.org/x/tools/go/analysis/singlechecker"
 )
 

@@ -1,4 +1,4 @@
-module github.com/go-loglint
+module github.com/loglint/loglint
 
 go 1.26.1
 
