@@ -125,22 +125,28 @@ func extractStrings(expr ast.Expr) []string {
 	return nil
 }
 
-// resolveConfigPath resolves relative path to project root (where .golangci.yml is).
+// resolveConfigPath resolves relative path; returns absolute path when found.
 func resolveConfigPath(path string, pass *analysis.Pass) string {
-	if filepath.IsAbs(path) {
+	if filepath.IsAbs(path) && fileExists(path) {
 		return path
 	}
-	// Try CWD first (golangci-lint usually runs from project root)
+	// Try CWD first
 	if fileExists(path) {
+		if abs, err := filepath.Abs(path); err == nil {
+			return abs
+		}
 		return path
 	}
-	// Try relative to first analyzed file, walking up to find project root
+	// Walk up from first analyzed file to find config
 	if len(pass.Files) > 0 {
 		fpath := pass.Fset.Position(pass.Files[0].Pos()).Filename
 		dir := filepath.Dir(fpath)
 		for dir != "" && dir != "." {
 			p := filepath.Join(dir, path)
 			if fileExists(p) {
+				if abs, err := filepath.Abs(p); err == nil {
+					return abs
+				}
 				return p
 			}
 			parent := filepath.Dir(dir)
