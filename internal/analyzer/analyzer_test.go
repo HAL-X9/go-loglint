@@ -2,8 +2,10 @@ package analyzer
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/analysistest"
 )
 
@@ -148,4 +150,46 @@ func TestResolveConfiguredPath(t *testing.T) {
 			t.Fatalf("resolveConfiguredPath() path = %q, want empty", got)
 		}
 	})
+}
+
+func TestResolveConfigPath_UsesPWDForRelativePath(t *testing.T) {
+	dir := t.TempDir()
+	cfgPath := filepath.Join(dir, "loglint.yaml")
+	cfgYAML := `
+rules:
+  - name: lowercase_start
+    enable: true
+  - name: english_only
+    enable: true
+  - name: no_special_chars
+    enable: true
+  - name: no_sensitive_data
+    enable: true
+loggers:
+  include:
+    - log
+    - slog
+`
+	if err := os.WriteFile(cfgPath, []byte(cfgYAML), 0644); err != nil {
+		t.Fatalf("write config file: %v", err)
+	}
+
+	prevPWD, hadPWD := os.LookupEnv("PWD")
+	_ = os.Setenv("PWD", dir)
+	t.Cleanup(func() {
+		if hadPWD {
+			_ = os.Setenv("PWD", prevPWD)
+			return
+		}
+		os.Unsetenv("PWD")
+	})
+
+	got := resolveConfigPath("./loglint.yaml", &analysis.Pass{})
+	want, err := filepath.Abs(cfgPath)
+	if err != nil {
+		t.Fatalf("abs path: %v", err)
+	}
+	if got != want {
+		t.Fatalf("resolveConfigPath() = %q, want %q", got, want)
+	}
 }

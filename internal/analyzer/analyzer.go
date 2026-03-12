@@ -159,6 +159,19 @@ func resolveConfigPath(path string, pass *analysis.Pass) string {
 	if filepath.IsAbs(path) && fileExists(path) {
 		return path
 	}
+	// For plugin mode, preserve the shell invocation directory semantics for
+	// relative env paths like LOGLINT_CONFIG_PATH=./loglint.yaml.
+	if !filepath.IsAbs(path) {
+		if pwd := strings.TrimSpace(os.Getenv("PWD")); pwd != "" {
+			p := filepath.Join(pwd, path)
+			if fileExists(p) {
+				if abs, err := filepath.Abs(p); err == nil {
+					return abs
+				}
+				return p
+			}
+		}
+	}
 	// Try CWD first
 	if fileExists(path) {
 		if abs, err := filepath.Abs(path); err == nil {
@@ -169,6 +182,9 @@ func resolveConfigPath(path string, pass *analysis.Pass) string {
 	// Walk up from first analyzed file to find config
 	if len(pass.Files) > 0 {
 		fpath := pass.Fset.Position(pass.Files[0].Pos()).Filename
+		if abs, err := filepath.Abs(fpath); err == nil {
+			fpath = abs
+		}
 		dir := filepath.Dir(fpath)
 		for dir != "" && dir != "." {
 			p := filepath.Join(dir, path)

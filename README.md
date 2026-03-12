@@ -115,7 +115,7 @@ plugins:
   # Remote (from GitHub)
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.10
+    version: v1.0.11
 
   # Or local
   # - module: github.com/HAL-X9/go-loglint
