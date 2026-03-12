@@ -197,6 +197,33 @@ loggers:
 	})
 }
 
+func TestGetPathFromGolangciLintSettings(t *testing.T) {
+	t.Run("flat_config", func(t *testing.T) {
+		settings := map[string]any{"config": "./loglint.yaml"}
+		if got := GetPathFromGolangciLintSettings(settings); got != "./loglint.yaml" {
+			t.Errorf("GetPathFromGolangciLintSettings() = %q, want ./loglint.yaml", got)
+		}
+	})
+	t.Run("nested_settings", func(t *testing.T) {
+		settings := map[string]any{
+			"type":        "module",
+			"description": "Log linter",
+			"settings":    map[string]any{"config": "./loglint.yaml"},
+		}
+		if got := GetPathFromGolangciLintSettings(settings); got != "./loglint.yaml" {
+			t.Errorf("GetPathFromGolangciLintSettings() = %q, want ./loglint.yaml", got)
+		}
+	})
+	t.Run("empty_returns_empty", func(t *testing.T) {
+		if got := GetPathFromGolangciLintSettings(nil); got != "" {
+			t.Errorf("GetPathFromGolangciLintSettings(nil) = %q, want empty", got)
+		}
+		if got := GetPathFromGolangciLintSettings(map[string]any{}); got != "" {
+			t.Errorf("GetPathFromGolangciLintSettings(empty) = %q, want empty", got)
+		}
+	})
+}
+
 func TestLoadFromEnv(t *testing.T) {
 	saveEnv := func() (string, bool) {
 		v, ok := os.LookupEnv("LOGLINT_CONFIG_PATH")

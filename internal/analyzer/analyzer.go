@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/HAL-X9/go-loglint/internal/config"
@@ -38,13 +39,16 @@ func run(pass *analysis.Pass) (interface{}, error) {
 		path = os.Getenv("LOGLINT_CONFIG_PATH")
 	}
 	if path != "" {
-		cfg, err := config.LoadConfig(path)
+		resolved := resolveConfigPath(path, pass)
+		cfg, err := config.LoadConfig(resolved)
 		if err != nil {
-			return nil, err
-		}
-		enabledRules = make(map[string]bool)
-		for _, r := range cfg.Rules {
-			enabledRules[r.Name] = r.Enable
+			// Config load failed — use default rules so linter still runs
+			enabledRules = defaultEnabledRules()
+		} else {
+			enabledRules = make(map[string]bool)
+			for _, r := range cfg.Rules {
+				enabledRules[r.Name] = r.Enable
+			}
 		}
 	}
 
@@ -119,6 +123,39 @@ func extractStrings(expr ast.Expr) []string {
 		return append(extractStrings(e.X), extractStrings(e.Y)...)
 	}
 	return nil
+}
+
+// resolveConfigPath resolves relative path to project root (where .golangci.yml is).
+func resolveConfigPath(path string, pass *analysis.Pass) string {
+	if filepath.IsAbs(path) {
+		return path
+	}
+	// Try CWD first (golangci-lint usually runs from project root)
+	if fileExists(path) {
+		return path
+	}
+	// Try relative to first analyzed file, walking up to find project root
+	if len(pass.Files) > 0 {
+		fpath := pass.Fset.Position(pass.Files[0].Pos()).Filename
+		dir := filepath.Dir(fpath)
+		for dir != "" && dir != "." {
+			p := filepath.Join(dir, path)
+			if fileExists(p) {
+				return p
+			}
+			parent := filepath.Dir(dir)
+			if parent == dir {
+				break
+			}
+			dir = parent
+		}
+	}
+	return path
+}
+
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
 }
 
 // isLoggerCall reports whether sel is a logging call (Info, Warn, Error, etc.).

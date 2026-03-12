@@ -15,11 +15,27 @@ func GetPathFromGolangciLintSettings(settings any) string {
 	if m == nil {
 		return ""
 	}
-	if c, ok := m["config"].(string); ok && c != "" {
+	// Flat: {config: "..."} or {Config: "..."}
+	if c := getStr(m, "config", "Config"); c != "" {
 		return c
 	}
+	// Nested: {settings: {config: "..."}}
 	if s, ok := m["settings"].(map[string]any); ok {
-		if c, ok := s["config"].(string); ok && c != "" {
+		if c := getStr(s, "config", "Config"); c != "" {
+			return c
+		}
+	}
+	if s, ok := m["Settings"].(map[string]any); ok {
+		if c := getStr(s, "config", "Config"); c != "" {
+			return c
+		}
+	}
+	return ""
+}
+
+func getStr(m map[string]any, keys ...string) string {
+	for _, k := range keys {
+		if c, ok := m[k].(string); ok && c != "" {
 			return c
 		}
 	}
