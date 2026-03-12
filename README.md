@@ -27,7 +27,7 @@ A Go linter for log statements that enforces best practices and consistency acro
 
 ```bash
 # Clone the repository
-git clone https://github.com/loglint/loglint.git
+git clone https://github.com/HAL-X9/go-loglint.git
 cd loglint
 
 # Build the binary
@@ -113,14 +113,14 @@ version: v2.11.3
 
 plugins:
   # Remote (from GitHub)
-  - module: github.com/loglint/loglint
-    import: github.com/loglint/loglint/plugin/module
+  - module: github.com/HAL-X9/go-loglint
+    import: github.com/HAL-X9/go-loglint/plugin/module
     version: v1.0.0
 
   # Or local
-  # - module: github.com/loglint/loglint
+  # - module: github.com/HAL-X9/go-loglint
   #   path: /path/to/loglint
-  #   import: github.com/loglint/loglint/plugin/module
+  #   import: github.com/HAL-X9/go-loglint/plugin/module
 ```
 
 ### 2. Build custom golangci-lint

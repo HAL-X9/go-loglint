@@ -7,11 +7,11 @@ version: v2.11.3  # Must match: golangci-lint version
 
 plugins:
   # Remote (from GitHub)
-  - module: github.com/loglint/loglint
-    import: github.com/loglint/loglint/plugin/module
+  - module: github.com/HAL-X9/go-loglint
+    import: github.com/HAL-X9/go-loglint/plugin/module
     version: v1.0.0
 
   # Or local
-  # - module: github.com/loglint/loglint
+  # - module: github.com/HAL-X9/go-loglint
   #   path: /path/to/loglint
-  #   import: github.com/loglint/loglint/plugin/module
+  #   import: github.com/HAL-X9/go-loglint/plugin/module

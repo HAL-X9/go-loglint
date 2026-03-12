@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/loglint/loglint/internal/config"
-	"github.com/loglint/loglint/internal/rules"
+	"github.com/HAL-X9/go-loglint/internal/config"
+	"github.com/HAL-X9/go-loglint/internal/rules"
 	"golang.org/x/tools/go/analysis"
 )
 
