@@ -101,42 +101,72 @@ slog.Debug("api request completed")
 slog.Info("authentication completed")
 ```
 
-## golangci-lint Plugin
+## golangci-lint Plugin (Module Plugin — recommended)
 
-### Build
+Module plugin works with any golangci-lint installation. No CGO required.
 
-```bash
-CGO_ENABLED=1 make plugin
-# or
-CGO_ENABLED=1 go build -buildmode=plugin -o ./bin/loglint.so ./plugin
+### 1. Create `.custom-gcl.yml` in your project
+
+```yaml
+# Get your version: golangci-lint version
+version: v2.10.0
+
+plugins:
+  - module: github.com/go-loglint
+    path: /path/to/loglint   # or use version: v1.0.0 when published
+    import: github.com/go-loglint/plugin/module
 ```
 
-### Install
-
-1. Copy the plugin:
+### 2. Build custom golangci-lint
 
 ```bash
-cp ./bin/loglint.so ~/.golangci-lint/plugins/loglint.so
+golangci-lint custom
 ```
 
-2. Add to `.golangci.yml`:
+This creates `./custom-gcl` (or `./golangci-lint` depending on config).
+
+### 3. Add to `.golangci.yml`
+
+```yaml
+version: "2"
+linters:
+  enable:
+    - loglint
+    # ... other linters
+  settings:
+    custom:
+      loglint:
+        type: module
+        description: Log message linter
+```
+
+### 4. Run
+
+```bash
+./custom-gcl run
+```
+
+---
+
+### Go Plugin (legacy, requires CGO)
+
+```bash
+CGO_ENABLED=1 make build-plugin
+cp ./bin/loglint.so ~/.golangci-lint/plugins/
+```
+
+Add to `.golangci.yml`:
 
 ```yaml
 linters:
   settings:
     custom:
       loglint:
-        path: ~/.golangci-lint/plugins/loglint.so
+        path: /Users/sergey/.golangci-lint/plugins/loglint.so
         description: Log message linter
 ```
 
-3. Run:
-
-```bash
-golangci-lint run
-```
-
-Plugin must be built for the same OS/arch as golangci-lint. If using pre-built golangci-lint, build the plugin on the same machine.
+Note: Go plugin requires golangci-lint built with CGO; pre-built binaries often don't support it.
 
 ## Configuration
 
@@ -175,7 +205,7 @@ Example files in `testdata/example/` demonstrate all rules:
 make help          # Show available commands
 make run-loglint   # Run loglint locally
 make build         # Build binary to ./bin/
-make plugin        # Build golangci-lint plugin
+make build-plugin  # Build golangci-lint plugin
 make test          # Run tests
 make clean         # Remove build artifacts
 ```

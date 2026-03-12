@@ -1,0 +1,17 @@
+# Example config for building custom golangci-lint with loglint.
+# Copy to your project as .custom-gcl.yml and run: golangci-lint custom
+#
+# Get your golangci-lint version: golangci-lint version
+
+version: v2.10.0  # Must match your golangci-lint version
+
+plugins:
+  # From local path (absolute or relative to project)
+  - module: github.com/go-loglint
+    path: /Users/sergey/Projects/loglint
+    import: github.com/go-loglint/plugin/module
+
+  # Or from GitHub when published:
+  # - module: github.com/go-loglint
+  #   version: v1.0.0
+  #   import: github.com/go-loglint/plugin/module
