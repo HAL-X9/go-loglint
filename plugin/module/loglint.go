@@ -12,12 +12,24 @@ func init() {
 }
 
 type loglintSettings struct {
-	Config string `mapstructure:"config"`
+	Config string `json:"config"`
+}
+
+type loglintSettingsNested struct {
+	Settings struct {
+		Config string `json:"config"`
+	} `json:"settings"`
 }
 
 func New(settings any) (register.LinterPlugin, error) {
+	// Try flat structure first: {config: "..."}
 	if s, err := register.DecodeSettings[loglintSettings](settings); err == nil && s.Config != "" {
 		analyzer.SetConfigPath(s.Config)
+		return &loglintPlugin{}, nil
+	}
+	// Try nested: {settings: {config: "..."}}
+	if s, err := register.DecodeSettings[loglintSettingsNested](settings); err == nil && s.Settings.Config != "" {
+		analyzer.SetConfigPath(s.Settings.Config)
 	}
 	return &loglintPlugin{}, nil
 }
