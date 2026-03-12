@@ -41,7 +41,7 @@ make build
 ./bin/go-loglint ./...
 
 # With config
-./bin/go-loglint -config=loglint.yaml ./...
+./bin/go-loglint -loglint-config=loglint.yaml ./...
 
 # Run on testdata
 ./bin/go-loglint ./testdata/example
@@ -115,7 +115,7 @@ plugins:
   # Remote (from GitHub)
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.8
+    version: v1.0.9
 
   # Or local
   # - module: github.com/HAL-X9/go-loglint

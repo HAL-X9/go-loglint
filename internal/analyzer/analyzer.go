@@ -14,9 +14,11 @@ import (
 )
 
 var configPath string
+var legacyConfigPath string
 
 func init() {
-	Analyzer.Flags.StringVar(&configPath, "config", "", "path to YAML config file (optional, all rules enabled by default)")
+	Analyzer.Flags.StringVar(&configPath, "loglint-config", "", "path to loglint YAML config file (optional, all rules enabled by default)")
+	Analyzer.Flags.StringVar(&legacyConfigPath, "config", "", "deprecated: use -loglint-config")
 }
 
 // SetConfigPath sets the config file path (used by golangci-lint plugin).
@@ -34,11 +36,7 @@ var Analyzer = &analysis.Analyzer{
 // run walks the AST and checks function calls for log message violations.
 func run(pass *analysis.Pass) (interface{}, error) {
 	enabledRules := defaultEnabledRules()
-	path := configPath
-	if path == "" {
-		path = os.Getenv("LOGLINT_CONFIG_PATH")
-	}
-	explicitConfig := path != ""
+	path, explicitConfig := resolveConfiguredPath()
 	if explicitConfig {
 		resolved := resolveConfigPath(path, pass)
 		cfg, err := config.LoadConfig(resolved)
@@ -68,6 +66,35 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 
 	return nil, nil
+}
+
+func resolveConfiguredPath() (string, bool) {
+	if envPath := strings.TrimSpace(os.Getenv("LOGLINT_CONFIG_PATH")); envPath != "" {
+		return envPath, true
+	}
+	if path := strings.TrimSpace(configPath); path != "" {
+		return path, true
+	}
+	if path := strings.TrimSpace(legacyConfigPath); path != "" {
+		// golangci-lint itself uses -config for .golangci.yml.
+		// Ignore that value for legacy support to avoid false config loads.
+		if looksLikeGolangCIConfig(path) {
+			return "", false
+		}
+		return path, true
+	}
+	return "", false
+}
+
+func looksLikeGolangCIConfig(path string) bool {
+	base := strings.ToLower(filepath.Base(path))
+	switch base {
+	case ".golangci.yml", ".golangci.yaml", ".golangci.toml", ".golangci.json",
+		"golangci.yml", "golangci.yaml", "golangci.toml", "golangci.json":
+		return true
+	default:
+		return false
+	}
 }
 
 func defaultEnabledRules() map[string]bool {

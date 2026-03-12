@@ -9,11 +9,14 @@ import (
 
 func TestAnalyzer(t *testing.T) {
 	prevConfigPath := configPath
+	prevLegacyConfigPath := legacyConfigPath
 	prevEnv, envWasSet := os.LookupEnv("LOGLINT_CONFIG_PATH")
 	configPath = ""
+	legacyConfigPath = ""
 	os.Unsetenv("LOGLINT_CONFIG_PATH")
 	t.Cleanup(func() {
 		configPath = prevConfigPath
+		legacyConfigPath = prevLegacyConfigPath
 		if envWasSet {
 			_ = os.Setenv("LOGLINT_CONFIG_PATH", prevEnv)
 			return
@@ -52,11 +55,14 @@ func F(password, apiKey string) {
 
 func TestAnalyzer_ConfigPathInvalid_DisablesRules(t *testing.T) {
 	prevConfigPath := configPath
+	prevLegacyConfigPath := legacyConfigPath
 	prevEnv, envWasSet := os.LookupEnv("LOGLINT_CONFIG_PATH")
 	configPath = ""
+	legacyConfigPath = ""
 	_ = os.Setenv("LOGLINT_CONFIG_PATH", "/definitely/missing/loglint.yaml")
 	t.Cleanup(func() {
 		configPath = prevConfigPath
+		legacyConfigPath = prevLegacyConfigPath
 		if envWasSet {
 			_ = os.Setenv("LOGLINT_CONFIG_PATH", prevEnv)
 			return
@@ -85,4 +91,61 @@ func F() {
 
 	// No diagnostics expected: explicit config path is invalid.
 	analysistest.Run(t, dir, Analyzer, "pkg")
+}
+
+func TestResolveConfiguredPath(t *testing.T) {
+	prevConfigPath := configPath
+	prevLegacyConfigPath := legacyConfigPath
+	prevEnv, envWasSet := os.LookupEnv("LOGLINT_CONFIG_PATH")
+	t.Cleanup(func() {
+		configPath = prevConfigPath
+		legacyConfigPath = prevLegacyConfigPath
+		if envWasSet {
+			_ = os.Setenv("LOGLINT_CONFIG_PATH", prevEnv)
+			return
+		}
+		os.Unsetenv("LOGLINT_CONFIG_PATH")
+	})
+
+	t.Run("env_has_highest_priority", func(t *testing.T) {
+		configPath = "flag.yaml"
+		legacyConfigPath = "legacy.yaml"
+		_ = os.Setenv("LOGLINT_CONFIG_PATH", "env.yaml")
+
+		got, explicit := resolveConfiguredPath()
+		if !explicit {
+			t.Fatal("resolveConfiguredPath() explicit = false, want true")
+		}
+		if got != "env.yaml" {
+			t.Fatalf("resolveConfiguredPath() path = %q, want env.yaml", got)
+		}
+	})
+
+	t.Run("uses_new_flag_when_env_empty", func(t *testing.T) {
+		_ = os.Unsetenv("LOGLINT_CONFIG_PATH")
+		configPath = "flag.yaml"
+		legacyConfigPath = "legacy.yaml"
+
+		got, explicit := resolveConfiguredPath()
+		if !explicit {
+			t.Fatal("resolveConfiguredPath() explicit = false, want true")
+		}
+		if got != "flag.yaml" {
+			t.Fatalf("resolveConfiguredPath() path = %q, want flag.yaml", got)
+		}
+	})
+
+	t.Run("ignores_legacy_golangci_config_path", func(t *testing.T) {
+		_ = os.Unsetenv("LOGLINT_CONFIG_PATH")
+		configPath = ""
+		legacyConfigPath = ".golangci.yml"
+
+		got, explicit := resolveConfiguredPath()
+		if explicit {
+			t.Fatal("resolveConfiguredPath() explicit = true, want false")
+		}
+		if got != "" {
+			t.Fatalf("resolveConfiguredPath() path = %q, want empty", got)
+		}
+	})
 }
