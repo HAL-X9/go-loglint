@@ -16,7 +16,7 @@ version: v2.11.3   # Должно совпадать с: golangci-lint version
 plugins:
   - module: github.com/HAL-X9/go-loglint
     import: github.com/HAL-X9/go-loglint/plugin/module
-    version: v1.0.12
+    version: v1.0.0
 ```
 
 **Шаг 2.** Собери кастомный golangci-lint:
